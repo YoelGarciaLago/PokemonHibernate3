@@ -1,0 +1,15 @@
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:postgresql://localhost/postgres</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">postgres</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgresPlusDialect</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
+        <mapping class="Model.Pokedex"/>
+        <mapping class="Model.Adestrador"/>
+        <mapping class="Model.Pokemon"/>
+        <mapping class="Model.DTO.PokedexDTO"/>
+    </session-factory>
+</hibernate-configuration>
