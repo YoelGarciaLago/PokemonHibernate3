@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -118,6 +119,9 @@ public class AdestradorServices {
         EscribirXML.escribirAdestradoresXML(lista);
     }
 
+    /**
+     *
+     */
     public void exportarAdestradoresXML() {
         try (Session session = HibernateConfig.getSessionFactory().openSession()) {
             List<Adestrador> adestradorList = session.createQuery("FROM Adestrador", Adestrador.class)
@@ -136,22 +140,26 @@ public class AdestradorServices {
         }
     }
 
-    public void importarAdestradoresXML() {
+    public List<Adestrador> importarAdestradoresXML() {
+        List<Adestrador> adestradorList = new ArrayList<>();
         try {
             JAXBContext context = JAXBContext.newInstance(Wrapper.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Wrapper wrapper = (Wrapper) unmarshaller.unmarshal(new File("adestradores.xml"));
-            List<Adestrador> adestradorList = wrapper.getAdestradores();
-            try (Session session = HibernateConfig.getSessionFactory().openSession()) {
-                Transaction tx = session.beginTransaction();
-                for (Adestrador adestrador : adestradorList) {
-                    session.update(adestrador);
-                }
-                tx.commit();
-            }
+            adestradorList = wrapper.getAdestradores();
+//            try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+//                Transaction tx = session.beginTransaction();
+//                for (Adestrador adestrador : adestradorList) {
+//                    session.update(adestrador);
+//                }
+//                tx.commit();
+//            }
+
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+        return adestradorList;
+
     }
 }
 
