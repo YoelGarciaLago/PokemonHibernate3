@@ -65,12 +65,12 @@ public class AdestradorServices {
                 adestrador.setNome(name);
                 session.update(adestrador);
                 transaction.commit();
-                actualizarTabla(session);
+               // actualizarTabla(session);
             }else
                 System.out.println("Non existe un adestrador con ese id");
 
         } catch (Exception e) {
-            System.out.println("Erro ao modificar o campo");
+            System.out.println("Erro ao modificar o campo " + e.getMessage());
         }
     }
 

@@ -105,11 +105,11 @@ public class PokedexServices {
                 pokedex.setMisc(misc);
                 session.update(pokedex);
                 transaction.commit();
-                actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
+                //actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
             }else
                 System.out.println("No existe la entrada con ese id");
         } catch (Exception e) {
-            System.out.println("Error al actualizar la entrada");
+            System.out.println("Error al actualizar la entrada " + e.getMessage());
         }
     }
     public void actualizarPokemonPeso (Long id, double peso){
