@@ -17,7 +17,7 @@ public class Pokemon {
     @Column(name = "nacemento",nullable = false)
     private Date nacemento;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "pokedexentry",referencedColumnName = "id",nullable = true)
     private Pokedex pokedexentry;
 
@@ -36,6 +36,8 @@ public class Pokemon {
         this.adestrador = adestrador;
     }
 
+
+
     public Pokemon(String nome, Date nacemento, Pokedex pokedexentry, Adestrador adestrador) {
         this.nome = nome;
         this.nacemento = nacemento;
@@ -47,6 +49,11 @@ public class Pokemon {
         this.nome = nome;
         this.nacemento = nacemento;
     }
+
+    public Pokemon(long id, String string, java.sql.Date nacemento, int i, int i1) {
+
+    }
+
 
     public long getId() {
         return id;
@@ -86,5 +93,16 @@ public class Pokemon {
 
     public void setAdestrador(Adestrador adestrador) {
         this.adestrador = adestrador;
+    }
+
+    @Override
+    public String toString() {
+        return "Pokemon{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", nacemento=" + nacemento +
+                ", pokedexentry=" + pokedexentry +
+                ", adestrador=" + adestrador +
+                '}';
     }
 }

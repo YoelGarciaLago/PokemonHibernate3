@@ -11,7 +11,10 @@ import org.hibernate.Transaction;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PokemonServices {
@@ -80,30 +83,54 @@ public class PokemonServices {
         }
     }
 
-    public void listaPokemon(){
-        try(Session session = HibernateConfig.getSessionFactory().openSession()){
+    public void darPokemons(){
+
+        Session session = HibernateConfig.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        PokedexServices pokedexServices = new PokedexServices();
+        AdestradorServices adestradorServices = new AdestradorServices();
+        List<Pokemon>lista = new ArrayList<>();
+        Pokemon pokemon1 = new Pokemon("pikachu", Date.valueOf(LocalDate.of(1990, 1, 20)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon2 = new Pokemon("gengar", Date.valueOf(LocalDate.of(1990, 1, 21)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon3 = new Pokemon("Feraligatr", Date.valueOf(LocalDate.of(1990, 1, 22)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon4 = new Pokemon("tinkaton", Date.valueOf(LocalDate.of(1990, 1, 23)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon5 = new Pokemon("steelix", Date.valueOf(LocalDate.of(1990, 1, 24)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon6 = new Pokemon("houndoom", Date.valueOf(LocalDate.of(1990, 1, 25)), pokedexServices.buscarPokemon(1), adestradorServices.buscarAdestrador(1));
+        Pokemon pokemon7 = new Pokemon("sneasler", Date.valueOf(LocalDate.of(1990, 1, 26)), pokedexServices.buscarPokemon(2), adestradorServices.buscarAdestrador(2));
+        Pokemon pokemon8 = new Pokemon("aerodactyl", Date.valueOf(LocalDate.of(1990, 1, 27)), pokedexServices.buscarPokemon(2), adestradorServices.buscarAdestrador(2));
+        Pokemon pokemon9 = new Pokemon("charizard", Date.valueOf(LocalDate.of(1990, 1, 28)), pokedexServices.buscarPokemon(2), adestradorServices.buscarAdestrador(2));
+        Pokemon pokemon10 = new Pokemon("goldengho", Date.valueOf(LocalDate.of(1990, 2, 20)), pokedexServices.buscarPokemon(2), adestradorServices.buscarAdestrador(2));
+        Pokemon pokemon11 = new Pokemon("dragonite", Date.valueOf(LocalDate.of(1990, 4, 20)), pokedexServices.buscarPokemon(2), adestradorServices.buscarAdestrador(2));
+        Pokemon pokemon12 = new Pokemon("gyarados", Date.valueOf(LocalDate.of(1991, 1, 20)), null, adestradorServices.buscarAdestrador(2));
+        lista.add(pokemon1);
+        lista.add(pokemon2);
+        lista.add(pokemon3);
+        lista.add(pokemon4);
+        lista.add(pokemon5);
+        lista.add(pokemon6);
+        lista.add(pokemon7);
+        lista.add(pokemon8);
+        lista.add(pokemon9);
+        lista.add(pokemon10);
+        lista.add(pokemon11);
+        lista.add(pokemon12);
+
+        for(Pokemon pk : lista){
+            session.save(pk);
+        }
+        transaction.commit();
+        System.out.println("Pokemons guardados");
+    }
+
+    public void mostrarPK(){
+        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
-            String command = "Select * from pokedex order by id";
-            SQLQuery query = session.createSQLQuery(command);
-            List<Object[]> lista = crearLista(query);
-            System.out.println("Lista:----------------------------------------------------");
-            for (Object[] o : lista){
-               // Pokemon pokemon = new Pokemon(Long.parseLong(o[0].toString()),o[1].toString(), Date.valueOf(o[2].toString()),Integer.parseInt(o[3].toString()),Integer.parseInt(o[4].toString()));
-               // System.out.println("|" + pokemon + "|");
+            List<Pokemon> pokemonList = session.createQuery("from Pokemon", Pokemon.class).getResultList();
+            transaction.commit();
+            for(Pokemon pk: pokemonList){
+                System.out.println(pk);
             }
-            System.out.println("----------------------------------------------------");
-        } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
-
-    private static List<Object[]> crearLista(SQLQuery query) throws IOException, XMLStreamException {
-        List <Object[]> lista = query.list();
-        //EscribirXML.escribirPokedexXML(lista);
-        return lista;
-    }
-
 
 }

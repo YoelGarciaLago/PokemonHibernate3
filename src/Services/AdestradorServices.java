@@ -7,14 +7,24 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.NativeQuery;
-
+import Model.Wrapper;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
 
 public class AdestradorServices {
+
+    public Adestrador buscarAdestrador(long id){
+        Session session = HibernateConfig.getSessionFactory().openSession();
+        return session.get(Adestrador.class,id);
+    }
 
     public void meterAdestrador(String nome, Date dataNacemento){
         try(Session session = HibernateConfig.getSessionFactory().openSession()){
@@ -86,7 +96,7 @@ public class AdestradorServices {
             NativeQuery query = session.createNativeQuery("Delete from adestrador *");
             query.executeUpdate();
             transaction.commit();
-            actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
+           // actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
         }catch (Exception e){
             System.out.println("Error al borrar la tabla --> " + e.getMessage());
         }
@@ -106,6 +116,42 @@ public class AdestradorServices {
     private static void actualizarXml(List session) throws IOException, XMLStreamException {
         List<Object[]> lista = session;
         EscribirXML.escribirAdestradoresXML(lista);
+    }
+
+    public void exportarAdestradoresXML() {
+        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+            List<Adestrador> adestradorList = session.createQuery("FROM Adestrador", Adestrador.class)
+                    .setMaxResults(2)
+                    .list();
+            try {
+                JAXBContext context = JAXBContext.newInstance(Wrapper.class);
+                Marshaller marshaller = context.createMarshaller();
+                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                Wrapper wrapper = new Wrapper();
+                wrapper.setAdestradores(adestradorList);
+                marshaller.marshal(wrapper, new File("adestradores.xml"));
+            } catch (JAXBException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void importarAdestradoresXML() {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Wrapper.class);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Wrapper wrapper = (Wrapper) unmarshaller.unmarshal(new File("adestradores.xml"));
+            List<Adestrador> adestradorList = wrapper.getAdestradores();
+            try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+                Transaction tx = session.beginTransaction();
+                for (Adestrador adestrador : adestradorList) {
+                    session.update(adestrador);
+                }
+                tx.commit();
+            }
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
     }
 }
 

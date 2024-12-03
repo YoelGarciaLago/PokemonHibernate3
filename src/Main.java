@@ -1,8 +1,10 @@
+import Model.Pokedex;
 import Services.AdestradorServices;
 import Services.PokedexServices;
 import Services.PokemonServices;
 
 import java.sql.Date;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,8 +12,8 @@ public class Main {
         AdestradorServices adestradorServices = new AdestradorServices();
         PokemonServices pokemonServices = new PokemonServices();
 
-       // pokedexServices.meterEntrada("pokemon1",1,"pokemon1");
-        //pokedexServices.meterEntrada("pokemon2",2,"pokemon1");
+//        pokedexServices.meterEntrada("pokemon1",1,"pokemon1");
+//        pokedexServices.meterEntrada("pokemon2",2,"pokemon1");
 //        pokedexServices.meterEntrada("pokemon3",3,"");
 //        pokedexServices.meterEntrada("pokemon4",4,"");
 //        pokedexServices.meterEntrada("pokemon5",5,"");
@@ -38,16 +40,25 @@ public class Main {
 //        pokemonServices.meterPokemon("pokemon10",Date.valueOf("2021-03-03"),10,2);
 //        pokemonServices.meterPokemon("pokemon11",2,Date.valueOf("2021-03-03"));
 //        pokemonServices.meterPokemon("pokemon12",2,Date.valueOf("2021-03-03"));
-//
-//
-//
+
+
+        //pokemonServices.darPokemons();
+        //pokemonServices.mostrarPK();
 //        pokedexServices.listaPokemon();
 //        adestradorServices.listarAdestradores();
-//        pokemonServices.listaPokemon();
 
-       //pokedexServices.serializarEntrada(1);
-       //pokedexServices.serializarEntrada(2);
+
+        //Me da error al leer el objeto serializado
+        /*
+       pokedexServices.serializarEntrada(1);
+       pokedexServices.serializarEntrada(2);
         pokedexServices.leerSerializado();
+*/
+        //pokedexServices.escrituraDAT();
+        //pokedexServices.exportarPokedex();
 
+        //adestradorServices.exportarAdestradoresXML();
+        //adestradorServices.importarAdestradoresXML();
+      //  pokedexServices.lecturaDAT();
     }
 }

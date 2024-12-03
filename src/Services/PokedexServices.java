@@ -1,7 +1,6 @@
 package Services;
 
 import Config.HibernateConfig;
-import Model.DTO.PokedexDTO;
 import Model.Pokedex;
 import Resources.EscribirXML;
 import org.hibernate.SQLQuery;
@@ -16,7 +15,6 @@ import java.util.List;
 
 
 public class PokedexServices {
-    private ArrayList<PokedexDTO> pkArrayList = new ArrayList<>();
 
     public void meterEntrada(String nome, int peso, String misc){
         try(Session session = HibernateConfig.getSessionFactory().openSession()){
@@ -46,6 +44,11 @@ public class PokedexServices {
         } catch (Exception e) {
             System.out.println("Error al eliminar la entrada --> " + e.getMessage());
         }
+    }
+
+    public Pokedex buscarPokemon(long id){
+        Session session = HibernateConfig.getSessionFactory().openSession();
+        return session.get(Pokedex.class,id);
     }
 
     public void listaPokemon(){
@@ -126,46 +129,68 @@ public class PokedexServices {
     }
 
 
-    public void serializarEntrada(long idPokedex){
-        try(Session session = HibernateConfig.getSessionFactory().openSession()) {
-            Pokedex select = session.get(Pokedex.class,idPokedex);
-            try {
-                escrituraAlDat(select);
-            } catch (Exception e) {
-                System.out.println("Error al serializar --> " + e.getMessage());
+//public void escrituraDAT(){
+//        List<Pokedex> lista = new ArrayList<>();
+//        lista.add(buscarPokemon(13L));
+//        lista.add(buscarPokemon(14L));
+//
+//    try {
+//        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("poke.dat"));
+//        for(int i = 0; i < 2; i++){
+//            oos.writeObject(lista.get(i));
+//        }
+//        oos.close();
+//        System.out.println("Entradas serializadas");
+//
+//    } catch (IOException e) {
+//        throw new RuntimeException(e);
+//        }
+//
+//    }
+//
+//    public void lecturaDAT(){
+//        try {
+//            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("poke.dat"));
+//            Pokedex pokedex = (Pokedex) ois.readObject();
+//            while (pokedex != null){
+//                pkArrayList.add(pokedex);
+//                pokedex = (Pokedex) ois.readObject();
+//            }
+//        } catch (IOException | ClassNotFoundException e) {
+//            System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void exportarPokedex() {
+        try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+            List<Pokedex> pokedexList = session.createQuery("FROM Pokedex", Pokedex.class)
+                    .setMaxResults(2)
+                    .list();
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("pokedex.dat"))) {
+                oos.writeObject(pokedexList);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }catch (Exception e){
-            System.out.println("Error al serializar: " + e.getMessage());
         }
     }
 
-    private static void escrituraAlDat(Pokedex select) throws IOException {
-        FileOutputStream fos = new FileOutputStream("pokedex.dat",true);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(new PokedexDTO(select.getId(), select.getNome(), select.getPeso(), select.getMisc()));
-        oos.flush();
-        oos.close();
-    }
-
-    public void leerSerializado(){
-        try{
-            FileInputStream fis = new FileInputStream("pokedex.dat");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            PokedexDTO pk;
-
-            while((pk = (PokedexDTO) ois.readObject()) != null){
-                System.out.println(pk);
+    public List<Pokedex> importarPokedex() {
+        List<Pokedex> pokedexList = List.of();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("pokedex.dat"))) {
+             pokedexList = (List<Pokedex>) ois.readObject();
+            try (Session session = HibernateConfig.getSessionFactory().openSession()) {
+                Transaction tx = session.beginTransaction();
+                for (Pokedex pokedex : pokedexList) {
+                    session.update(pokedex);
+                }
+                tx.commit();
             }
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Error --> " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("Error al leer --> " + e.getMessage());
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
 
+        return pokedexList;
     }
 
     public void borrarTabla() {
@@ -174,7 +199,7 @@ public class PokedexServices {
             NativeQuery query = session.createNativeQuery("Delete from pokedex *");
             query.executeUpdate();
             transaction.commit();
-            actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
+           // actualizarXml(session.createSQLQuery("select * from pokedex order by id").list());
         }catch (Exception e){
             System.out.println("Error al borrar la tabla --> " + e.getMessage());
         }

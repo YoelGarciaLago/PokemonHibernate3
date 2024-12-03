@@ -1,10 +1,11 @@
 package Model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "pokedex")
-public class Pokedex {
+public class Pokedex implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
